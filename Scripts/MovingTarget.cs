@@ -1,43 +1,40 @@
 using UnityEngine;
 
-namespace EnemyGeneration
+public class MovingTarget : MonoBehaviour
 {
-    public class MovingTarget : MonoBehaviour
+    [SerializeField] private Transform[] _waypoints;
+    [SerializeField] private float _speed = 3f;
+    [SerializeField] private float _reachThreshold = 0.1f;
+
+    private int _currentIndex;
+
+    private void Update()
     {
-        [SerializeField] private Transform[] _waypoints;
-        [SerializeField] private float _speed = 3f;
-        [SerializeField] private float _reachThreshold = 0.1f;
+        Move();
+    }
 
-        private int _currentIndex;
+    private void Move()
+    {
+        if (_waypoints == null || _waypoints.Length == 0)
+            return;
 
-        private void Update()
-        {
-            Move();
-        }
+        Transform targetPoint = _waypoints[_currentIndex];
 
-        private void Move()
-        {
-            if (_waypoints == null || _waypoints.Length == 0)
-                return;
+        transform.position = Vector3.MoveTowards(transform.position, targetPoint.position, _speed * Time.deltaTime);
 
-            Transform targetPoint = _waypoints[_currentIndex];
+        Vector3 direction = targetPoint.position - transform.position;
 
-            transform.position = Vector3.MoveTowards(transform.position, targetPoint.position, _speed * Time.deltaTime);
+        if (direction != Vector3.zero)
+            transform.forward = direction;
 
-            Vector3 direction = targetPoint.position - transform.position;
+        if (Vector3.Distance(transform.position, targetPoint.position) <= _reachThreshold)
+            MoveToNextPoint();
+    }
 
-            if (direction != Vector3.zero)
-                transform.forward = direction;
+    private void MoveToNextPoint()
+    {
+        const int StepIndex = 1;
 
-            if (Vector3.Distance(transform.position, targetPoint.position) <= _reachThreshold)
-                MoveToNextPoint();
-        }
-
-        private void MoveToNextPoint()
-        {
-            const int StepIndex = 1;
-
-            _currentIndex = (_currentIndex + StepIndex) % _waypoints.Length;
-        }
+        _currentIndex = (_currentIndex + StepIndex) % _waypoints.Length;
     }
 }

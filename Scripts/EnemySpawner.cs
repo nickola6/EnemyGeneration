@@ -1,45 +1,37 @@
 using System.Collections;
 using UnityEngine;
 
-public class EnemySpawner : MonoBehaviour
+namespace EnemyGeneration
 {
-    [SerializeField] private Enemy[] _enemyPrefabs;
-    [SerializeField] private Transform[] _spawnPoints;
-    [SerializeField] private Vector3 _moveDirection = Vector3.forward;
-    [SerializeField] private float _spawnDelay = 2f;
-
-    private void Start()
+    public class EnemySpawner : MonoBehaviour
     {
-        StartCoroutine(SpawnRoutine());
-    }
+        [SerializeField] private Enemy _enemyPrefab;
+        [SerializeField] private Transform _target;
+        [SerializeField] private float _delay = 5f;
 
-    private IEnumerator SpawnRoutine()
-    {
-        var wait = new WaitForSeconds(_spawnDelay);
+        private WaitForSeconds _wait;
 
-        while (isActiveAndEnabled)
+        private void Start()
         {
-            Spawn();
+            _wait = new WaitForSeconds(_delay);
 
-            yield return wait;
+            StartCoroutine(SpawnRoutine());
         }
-    }
 
-    private void Spawn()
-    {
-        const int MinValueRandom = 0;
+        private IEnumerator SpawnRoutine()
+        {
+            while (isActiveAndEnabled)
+            {
+                Spawn();
 
-        if (_spawnPoints.Length == 0 || _enemyPrefabs.Length == 0)
-            return;
+                yield return _wait;
+            }
+        }
 
-        int pointIndex = Random.Range(MinValueRandom, _spawnPoints.Length);
-        Transform spawnPoint = _spawnPoints[pointIndex];
-
-        int enemyIndex = Random.Range(MinValueRandom, _enemyPrefabs.Length);
-        Enemy prefab = _enemyPrefabs[enemyIndex];
-
-        Enemy enemy = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
-
-        enemy.Initialize(_moveDirection);
+        private void Spawn()
+        {
+            Enemy enemy = Instantiate(_enemyPrefab, transform.position, Quaternion.identity);
+            enemy.Initialize(_target);
+        }
     }
 }

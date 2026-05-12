@@ -1,37 +1,34 @@
 using System.Collections;
 using UnityEngine;
 
-namespace EnemyGeneration
+public class EnemySpawner : MonoBehaviour
 {
-    public class EnemySpawner : MonoBehaviour
+    [SerializeField] private Enemy _enemyPrefab;
+    [SerializeField] private Transform _target;
+    [SerializeField] private float _delay = 5f;
+
+    private WaitForSeconds _wait;
+
+    private void Start()
     {
-        [SerializeField] private Enemy _enemyPrefab;
-        [SerializeField] private Transform _target;
-        [SerializeField] private float _delay = 5f;
+        _wait = new WaitForSeconds(_delay);
 
-        private WaitForSeconds _wait;
+        StartCoroutine(SpawnRoutine());
+    }
 
-        private void Start()
+    private IEnumerator SpawnRoutine()
+    {
+        while (isActiveAndEnabled)
         {
-            _wait = new WaitForSeconds(_delay);
+            Spawn();
 
-            StartCoroutine(SpawnRoutine());
+            yield return _wait;
         }
+    }
 
-        private IEnumerator SpawnRoutine()
-        {
-            while (isActiveAndEnabled)
-            {
-                Spawn();
-
-                yield return _wait;
-            }
-        }
-
-        private void Spawn()
-        {
-            Enemy enemy = Instantiate(_enemyPrefab, transform.position, Quaternion.identity);
-            enemy.Initialize(_target);
-        }
+    private void Spawn()
+    {
+        Enemy enemy = Instantiate(_enemyPrefab, transform.position, Quaternion.identity);
+        enemy.Initialize(_target);
     }
 }

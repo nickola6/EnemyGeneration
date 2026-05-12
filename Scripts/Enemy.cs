@@ -2,17 +2,26 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private float _speed = 5f;
+    [SerializeField] private float _speed = 4f;
 
-    private Vector3 _direction;
+    private Transform _target;
 
     private void Update()
     {
-        transform.Translate(_direction * _speed * Time.deltaTime);
+        if (_target == null)
+            return;
+
+        MoveToTarget();
     }
 
-    public void Initialize(Vector3 direction)
+    public void Initialize(Transform target)
     {
-        _direction = direction.normalized;
+        _target = target;
+    }
+
+    private void MoveToTarget()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, _target.position, _speed * Time.deltaTime);
+        transform.LookAt(_target);
     }
 }
